@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css"/>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+    <style>
+        .section-container:hover {
+            background-color: #4b5563 !important;
+        }
+    </style>
+    <div style="width: 1000px">
+        <div class="justify-center items-center">
+            <table id="myTable" class="w-screen text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        User
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        IHA
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Action
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Time
+                    </th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        let table;
+
+        $(document).ready(function () {
+
+            table = $('#myTable').DataTable({
+                searching: false,
+                //"serverSide": true,
+                "processing": false,
+                paging: true,
+                info: false,
+                order: [],
+                "language": {
+                    "emptyTable": "Veri bulunamadı"
+                },
+                ajax: {
+                    url: 'http://127.0.0.1:8000/iha/user-actions-data/',
+                    dataSrc: ''
+                },
+                columns: [
+                    {data: 'username'},
+                    {data: 'iha'},
+                    {data: 'action'},
+                    {data: 'time'},
+                ],
+                createdRow: function (row, data, dataIndex) {
+                    $(row)
+                        .css('background-color', '#1f2937');
+                    $(row)
+                        .addClass('section-container border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600')
+                    $(row)
+                        .find('td')
+                        .addClass('px-6 py-4');
+                },
+            });
+        })
+    </script>
+
+{% endblock %}

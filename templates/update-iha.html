@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <form>
+        <div class="mb-6">
+            <label for="brand" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">IHA's brand</label>
+            <input type="text" id="brand"
+                   value="{{ iha.brand }}"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   placeholder="Baykar" required>
+        </div>
+        <div class="mb-6">
+            <label for="model" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">IHA's
+                model</label>
+            <input type="text" id="model-name"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   placeholder="Kızılelma"
+                   value="{{ iha.model_name }}"
+                   required/>
+        </div>
+        <button type="button" class="btn-update bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+            Update
+        </button>
+    </form>
+
+    <script>
+        $('.btn-update').on('click', (e) => {
+            const ihaBrand = $('#brand').val()
+            const ihaName = $('#model-name').val()
+
+            const headers = {
+                'X-CSRFToken': "{{ csrf_token }}"
+            }
+
+            const body = {
+                iha_brand: ihaBrand,
+                iha_name: ihaName
+            }
+            const url = window.location.pathname;
+            const parts = url.split('/'); // URL'yi "/" karakterine göre böl
+            const id = parts[parts.length - 2];
+
+            fetch("http://127.0.0.1:8000/iha/update/" + id + "/", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(body)
+            }).then(res => res.json())
+                .then(data => console.log(data))
+
+
+        })
+    </script>
+{% endblock %}

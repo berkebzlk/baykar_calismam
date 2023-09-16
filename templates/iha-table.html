@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css"/>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+
+    <style>
+
+        #btn-edit {
+            background-color: #ffc107 !important;
+            border-color: #ffc107;
+            color: #000;
+        }
+
+        #btn-edit:hover {
+            background-color: #d39e00 !important;
+            border-color: #d39e00;
+        }
+
+        .section-container:hover {
+            background-color: #4b5563 !important;
+        }
+
+        .action-values {
+            height: 0;
+        }
+
+    </style>
+    <div style="width: 1000px">
+        <form class="text-center mb-2 mt-5" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="flex justify-center items-center gap-2 ">
+                <div>
+                    <button type="submit" class=" bg-gray-800 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                        IHA ekle
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div class="justify-center items-center">
+            <table id="myTable" class="w-screen text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        Id
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Brand
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Model Name
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Status
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        <span class="laledes"></span>
+                    </th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        let table;
+
+        $(document).ready(function () {
+
+            table = $('#myTable').DataTable({
+                searching: true,
+                //"serverSide": true,
+                "processing": false,
+                paging: true,
+                info: false,
+                order: [],
+                "language": {
+                    "emptyTable": "Veri bulunamadı"
+                },
+                ajax: {
+                    url: 'http://127.0.0.1:8000/iha/all/',
+                    dataSrc: ''
+                },
+                columns: [
+                    {data: 'id'},
+                    {data: 'brand'},
+                    {data: 'model_name'},
+                    {data: 'status'},
+                    {
+                        data: null,
+                        "render": function (data) {
+                            return `<div class="flex justify-center items-center gap-1">
+                            <select class="action-selectbox w-1/2 py-1 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                                <option value="actions">Actions</option>
+                                <option id="btn-edit" value="update">Update</option>
+                                <option value="delete">Delete</option>
+                            <select/>
+                       </div>`;
+                        }
+                    }
+                ],
+                createdRow: function (row, data, dataIndex) {
+                    $(row)
+                        .css('background-color', '#1f2937');
+                    $(row)
+                        .addClass('section-container border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600')
+                    $(row)
+                        .find('td')
+                        .addClass('px-6 py-4');
+                    $(row)
+                        .find('.action-selectbox')
+                        .on('change', (e) => {
+                            let id = row.children[0].innerHTML;
+                            const actionValue = $(e.target).val()
+
+                            if (actionValue === 'update') {
+                                console.log('value == update')
+                                window.location.href = "http://127.0.0.1:8000/iha/update/" + id
+
+                            } else if (actionValue === 'delete') {
+                                console.log('value == delete')
+                                $.ajax({
+                                    url: 'http://127.0.0.1:8000/iha/delete/' + id + '/',
+                                    type: 'POST',
+                                    headers: {
+                                        'X-CSRFToken': '{{ csrf_token }}'
+                                    },
+                                    success: function (response) {
+                                        console.log('silme işlemi başarılı')
+                                        table.ajax.url('http://127.0.0.1:8000/iha/all/').load();
+                                        table.draw()
+                                    },
+                                    error: function (xhr, status, error) {
+                                        console.error('İstek hatası:', error);
+                                    }
+                                });
+                            }
+
+                        });
+                },
+
+            });
+        })
+    </script>
+
+{% endblock %}
