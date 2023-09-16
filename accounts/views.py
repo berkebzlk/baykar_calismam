@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model, authenticate, login, logout
 
 User = get_user_model()
@@ -53,6 +53,7 @@ class LoginUserView(APIView):
 
         if user is not None:
             login(request, user)
+            #return redirect('dashboard')
             return Response("Login success!", status=status.HTTP_200_OK)
         else:
             return Response("Login failed! Maybe the user was not created properly? Edit this response in accounts/views.py")
@@ -62,3 +63,14 @@ class LoginUserView(APIView):
 def logout_user_view(request):
     logout(request)
     return Response("Logged out")
+
+
+def render_dashboard(request):
+    if request.user.is_authenticated:
+        return render(request, 'dashboard.html')
+    else:
+        return redirect('login-user')
+
+
+
+

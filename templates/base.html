@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,10 +12,65 @@
             integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
             crossorigin="anonymous"></script>
 </head>
-<body>
-<main>
-    {% block content %}
-    {% endblock %}
-</main>
+<body class="bg-gray-900">
+<header>
+    <nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
+        <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+            <a href="https://flowbite.com" class="flex items-center">
+                <img src="{% static 'media/baykar-logo.png' %}" class="mr-3 h-6 sm:h-9" alt="Baykar Logo"/>
+                <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">Baykar</span>
+            </a>
+            <div class="flex items-center lg:order-2">
+                {% if user.is_authenticated %}
+                    <p class="text-white pr-2">Hoşgeldin {{ user.username }}</p>
+                    <btn href="{% url 'logout-user' %}"
+                         class="btn-logout cursor-pointer bg-gray-900 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
+                    >Log out
+                    </btn>
+                {% else %}
+                    <a href="{% url 'login-user' %}"
+                       class="bg-gray-900 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">Log in</a>
+                {% endif %}
+
+
+            </div>
+        </div>
+    </nav>
+</header>
+
+
+    <main class="flex">
+        <div class="m-auto">
+            {% block content %}
+            {% endblock %}
+        </div>
+
+    </main>
+
+
+<script>
+    $('.btn-logout').on('click', (e) => {
+        e.preventDefault()
+
+        const headers = {
+            'X-CSRFToken': "{{ csrf_token }}"
+        }
+
+        $.ajax({
+            type: "POST",
+            url: "http://127.0.0.1:8000/accounts/logout/",
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+            headers: headers,
+            success: function (response) {
+                console.log("Logout başarılı:", response);
+                window.location.href = "http://127.0.0.1:8000" + "{% url 'login-user' %}"
+            },
+            error: function (error) {
+                console.error("Hata:", error);
+            }
+        });
+    })
+</script>
 </body>
 </html>

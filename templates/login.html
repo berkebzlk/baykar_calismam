@@ -52,6 +52,10 @@
                     return
                 }
 
+                const headers = {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                }
+
                 const body = {
                     username,
                     password,
@@ -60,11 +64,13 @@
                 $.ajax({
                     type: "POST",
                     url: "http://127.0.0.1:8000/accounts/login/",
+                    headers: headers,
                     data: JSON.stringify(body),
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     success: function (response) {
                         console.log("Login başarılı:", response);
+                        window.location.href = "http://127.0.0.1:8000" + "{% url 'dashboard' %}"
                     },
                     error: function (error) {
                         console.error("Hata 💣💣💣:", error);
