@@ -15,6 +15,10 @@
     for windows:
         py manage.py runserver
 
+######### SUPER USER #########
+username: admin
+password: admin
+
 ######### ENDPOINTS #########
 
 http://127.0.0.1:8000/dashboard/
